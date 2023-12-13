@@ -45,7 +45,7 @@ app.use("/public", express.static(path.join(__dirname, "..", "public")));
 
 // mount routes
 app.get("/", (req, res) => {
-  res.status(200).send("<h1>Server is running! 👍</h1>");
+  res.status(200).send("<h1>Server is running!!! 👍</h1>");
 });
 app.use("/api/v1", indexRouter);
 
