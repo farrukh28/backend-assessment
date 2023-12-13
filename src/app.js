@@ -2,9 +2,6 @@
 import "./_bin/env-config.js";
 // --------
 
-// load redis
-import "./utils/redis.js";
-
 import indexRouter from "./routes/index.route.js";
 import express from "express";
 import http from "http";
