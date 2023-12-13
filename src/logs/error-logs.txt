@@ -1,0 +1,2 @@
+Error - 2023-12-13T19:22:52.656Z - POST /api/v1/users [400] - User with this email already exists
+Error - 2023-12-13T19:23:17.123Z - POST /api/v1/auth/login [400] - Password required
