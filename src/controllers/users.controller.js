@@ -68,9 +68,9 @@ export const updateUserByID = async (args) => {
   if (firstName) doc.firstName = firstName;
   if (lastName) doc.lastName = lastName;
   if (email) {
-    // check if new email already exists
-    const emailExists = await UsersModel.exists({ email });
-    if (emailExists) {
+    // check if new email already exists excluding user being updated
+    const emailExists = await UsersModel.findOne({ email });
+    if (emailExists && emailExists._id.toString() !== ID) {
       throw AppError(400, "User with this email already exists.");
     } else {
       doc.email = email;
