@@ -2,6 +2,7 @@ import { UsersModel } from "../models/index.model.js";
 import { AppError } from "../utils/error-handler.js";
 import { transformSortByString } from "../utils/helper-functions.js";
 import { userSignup } from "./auth.controller.js";
+import { nodeCache } from "../utils/node-cache.js";
 
 export const getAllUsers = async (args) => {
   let { userID, page, limit, sort } = args;
@@ -48,6 +49,9 @@ export const getUserByID = async (args) => {
 
   if (!data) throw AppError(404, "User not found");
 
+  // set cache
+  nodeCache.set(`user:${ID}`, data);
+
   return { success: true, data, fromCache: false };
 };
 
@@ -70,6 +74,9 @@ export const updateUserByID = async (args) => {
   );
 
   if (!data) throw AppError(404, "User not found");
+
+  // delete old cache
+  nodeCache.del(`user:${ID}`);
 
   return { success: true, data };
 };
