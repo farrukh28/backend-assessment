@@ -59,7 +59,7 @@ export const getUserByID = async (args) => {
 };
 
 export const updateUserByID = async (args) => {
-  const { ID, lastName, firstName } = args;
+  const { ID, lastName, firstName, email } = args;
 
   if (!ID) throw AppError(400, "Invalid user ID");
 
@@ -67,6 +67,7 @@ export const updateUserByID = async (args) => {
   const doc = {};
   if (firstName) doc.firstName = firstName;
   if (lastName) doc.lastName = lastName;
+  if (email) doc.email = email;
 
   const data = await UsersModel.findByIdAndUpdate(
     ID,
