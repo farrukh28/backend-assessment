@@ -3,6 +3,7 @@ import { AppError } from "../utils/error-handler.js";
 import { transformSortByString } from "../utils/helper-functions.js";
 import { userSignup } from "./auth.controller.js";
 import { nodeCache } from "../utils/node-cache.js";
+import { clearAllUsersCache } from "../middlewares/users.middleware.js";
 
 export const getAllUsers = async (args) => {
   let { userID, page, limit, sort } = args;
@@ -29,17 +30,26 @@ export const getAllUsers = async (args) => {
     .limit(limit);
 
   const totalCount = await UsersModel.find(query).countDocuments();
+  const totalPages = Math.ceil(totalCount / limit);
+
+  // cache results
+  const key = `get-all-users-page:${page}-limit:${limit}`;
+  nodeCache.set(key, { data, totalCount, totalPages });
 
   return {
     success: true,
     data,
     totalCount,
-    totalPages: Math.ceil(totalCount / limit),
+    totalPages,
   };
 };
 
 export const createUser = async (args) => {
   const data = await userSignup(args);
+
+  // clear all users cache
+  clearAllUsersCache();
+
   return data;
 };
 
@@ -87,8 +97,11 @@ export const updateUserByID = async (args) => {
 
   if (!data) throw AppError(404, "User not found");
 
-  // delete old cache
+  // delete old user cache
   nodeCache.del(`user:${ID}`);
+
+  // clear all users cache
+  clearAllUsersCache();
 
   return { success: true, data };
 };
@@ -99,5 +112,11 @@ export const deleteUserByID = async (args) => {
   if (!ID) throw AppError(400, "Invalid user ID");
 
   const data = await UsersModel.deleteOne({ _id: ID });
+
+  // delete old user cache
+  nodeCache.del(`user:${ID}`);
+  // clear all users cache
+  clearAllUsersCache();
+
   return { success: true, data };
 };

@@ -10,14 +10,17 @@ import {
   verifyToken,
   verifyAdmin,
 } from "../middlewares/authenticate.middleware.js";
-import { cacheUserByID } from "../middlewares/users.middleware.js";
+import {
+  cacheUserByID,
+  cacheAllUsers,
+} from "../middlewares/users.middleware.js";
 
 const router = Router();
 
 router
   .route("/")
   .all(verifyToken, verifyAdmin)
-  .get(async (req, res, next) => {
+  .get(cacheAllUsers, async (req, res, next) => {
     try {
       const args = { userID: req.user._id, ...req.query };
       const data = await getAllUsers(args);
