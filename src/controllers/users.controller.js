@@ -18,7 +18,10 @@ export const getAllUsers = async (args) => {
     },
   };
 
-  const sortQuery = transformSortByString(sort);
+  let sortQuery = {};
+  if (sort) {
+    sortQuery = transformSortByString(sort);
+  }
 
   const data = await UsersModel.find(query)
     .sort(sortQuery)
