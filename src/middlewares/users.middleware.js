@@ -13,13 +13,16 @@ export const cacheUserByID = (req, res, next) => {
 };
 
 export const cacheAllUsers = (req, res, next) => {
-  let { page, limit } = req.query;
+  let { page, limit, sort, q } = req.query;
 
   if (!page) page = 0;
   if (page) page--;
   if (!limit) limit = 10;
 
-  const key = `get-all-users-page:${page}-limit:${limit}`;
+  if (!sort) sort = "";
+  if (!q) q = "";
+
+  const key = `get-all-users-page:${page}-limit:${limit}-sort${sort}-q:${q}`;
 
   const data = nodeCache.get(key);
 

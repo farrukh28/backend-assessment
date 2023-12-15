@@ -6,7 +6,7 @@ import { nodeCache } from "../utils/node-cache.js";
 import { clearAllUsersCache } from "../middlewares/users.middleware.js";
 
 export const getAllUsers = async (args) => {
-  let { userID, page, limit, sort } = args;
+  let { userID, page, limit, sort, q } = args;
 
   if (!page) page = 0;
   if (page) page--;
@@ -19,9 +19,34 @@ export const getAllUsers = async (args) => {
     },
   };
 
+  // sort query
   let sortQuery = {};
   if (sort) {
     sortQuery = transformSortByString(sort);
+  }
+
+  // search query
+  if (q) {
+    query.$or = [
+      {
+        firstName: {
+          $regex: q,
+          $options: "i",
+        },
+      },
+      {
+        lastName: {
+          $regex: q,
+          $options: "i",
+        },
+      },
+      {
+        email: {
+          $regex: q,
+          $options: "i",
+        },
+      },
+    ];
   }
 
   const data = await UsersModel.find(query)
@@ -33,7 +58,9 @@ export const getAllUsers = async (args) => {
   const totalPages = Math.ceil(totalCount / limit);
 
   // cache results
-  const key = `get-all-users-page:${page}-limit:${limit}`;
+  if (!sort) sort = "";
+  if (!q) q = "";
+  const key = `get-all-users-page:${page}-limit:${limit}-sort${sort}-q:${q}`;
   nodeCache.set(key, { data, totalCount, totalPages });
 
   return {
